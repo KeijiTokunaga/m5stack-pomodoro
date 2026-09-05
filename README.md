@@ -1,6 +1,6 @@
 # M5Stack StopWatch Pomodoro
 
-日本語 | [English](README.en.md)
+[![日本語](docs/language-tabs/ja-active.svg)](README.md) [![English](docs/language-tabs/en.svg)](README.en.md)
 
 ![画面イメージ：停止中は青灰色、集中計測中はコーラル、休憩計測中はミント色](docs/pomodoro-preview.png)
 

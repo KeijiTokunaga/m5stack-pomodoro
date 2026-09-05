@@ -1,6 +1,6 @@
 # M5Stack StopWatch Pomodoro
 
-[日本語](README.md) | English
+[![日本語](docs/language-tabs/ja.svg)](README.md) [![English](docs/language-tabs/en-active.svg)](README.en.md)
 
 ![Pomodoro UI: stopped in blue-gray, focus running in coral, break running in mint](docs/pomodoro-preview.png)
 

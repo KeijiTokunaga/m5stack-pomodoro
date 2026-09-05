@@ -13,6 +13,7 @@ uint32_t lastPaint = 0, lastSave = 0, alarmAt = 0;
 bool alarmActive = false;
 int lastPulse = -1;
 const uint32_t muted = 0x8B929E;
+constexpr int touchLeft = 51, touchTop = 145, touchWidth = 364, touchHeight = 180;
 
 void save() {
   // One NVS blob keeps phase, count and remaining coherent after power loss.
@@ -53,18 +54,20 @@ void paint() {
   label("POMODORO", 63, 2, muted);
   label(timer.phase == Pomodoro::Focus ? "FOCUS" :
         timer.phase == Pomodoro::ShortBreak ? "SHORT BREAK" : "LONG BREAK", 111, 3, accent);
+  canvas.fillRoundRect(touchLeft, touchTop, touchWidth, touchHeight, 32,
+                       timer.phase == Pomodoro::Focus ? 0x301A17 : 0x112E26);
+  canvas.drawRoundRect(touchLeft, touchTop, touchWidth, touchHeight, 32, accent);
   char text[48];
   uint32_t seconds = (timer.remaining + 999) / 1000;
   snprintf(text, sizeof(text), "%02lu:%02lu", (unsigned long)(seconds / 60), (unsigned long)(seconds % 60));
   label(text, 170, 8, TFT_WHITE);
-  label(timer.running ? "ONE THING AT A TIME" : "READY WHEN YOU ARE", 254, 2, muted);
+  label(timer.running ? "TAP TO PAUSE" : "TAP TO START", 254, 3, accent);
+  label("TOUCH ANYWHERE IN THIS BOX", 295, 2, muted);
   for (int i = 0; i < 4; ++i) {
     int done = timer.completed % 4;
     if (timer.phase == Pomodoro::LongBreak) done = 4;
-    canvas.fillCircle(188 + i * 30, 298, 8, i < done ? accent : 0x30353D);
+    canvas.fillCircle(188 + i * 30, 351, 8, i < done ? accent : 0x30353D);
   }
-  canvas.fillRoundRect(129, 324, 208, 50, 25, accent);
-  label(timer.running ? "PAUSE" : "START", 339, 3, TFT_BLACK);
   snprintf(text, sizeof(text), "%lu DONE  /  SOUND %s", (unsigned long)timer.completed, soundOn ? "ON" : "OFF");
   label(text, 395, 2, muted);
   canvas.pushSprite(0, 0);
@@ -117,7 +120,8 @@ void loop() {
   else if (M5.BtnB.wasClicked()) action('m');
   auto touch = M5.Touch.getDetail();
   if (touch.wasClicked()) {
-    if (touch.x >= 129 && touch.x <= 337 && touch.y >= 324 && touch.y <= 374) action('a');
+    if (touch.x >= touchLeft && touch.x < touchLeft + touchWidth &&
+        touch.y >= touchTop && touch.y < touchTop + touchHeight) action('a');
     else if (touch.y >= 380 && touch.y <= 430) action('m');
   }
   // USB control supports repeatable hardware smoke tests and diagnostics.

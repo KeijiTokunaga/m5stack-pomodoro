@@ -1,0 +1,24 @@
+name: Firmware and timer tests
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install platformio==6.1.19
+      - name: Test timer
+        run: |
+          mkdir -p build
+          c++ -std=c++11 -Wall -Wextra -Werror -I include test/timer_test.cpp -o build/timer_test
+          ./build/timer_test
+      - run: pio run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stopwatch-firmware
+          path: |
+            .pio/build/m5stack-stopwatch/firmware.bin
+            .pio/build/m5stack-stopwatch/bootloader.bin
+            .pio/build/m5stack-stopwatch/partitions.bin

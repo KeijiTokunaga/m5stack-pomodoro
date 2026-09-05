@@ -41,7 +41,9 @@ void label(const char* text, int y, int size, uint32_t color) {
   canvas.drawCenterString(text, 233, y);
 }
 void paint() {
-  const uint32_t accent = timer.phase == Pomodoro::Focus ? 0xFF725E : 0x55D9B1;
+  const uint32_t accent = !timer.running ? 0x91A9CE :
+      timer.phase == Pomodoro::Focus ? 0xFF725E : 0x55D9B1;
+  const uint32_t ink = timer.running ? 0x101820 : 0xFFFFFF;
   canvas.fillScreen(TFT_BLACK);
   const float fraction = static_cast<float>(timer.remaining) / timer.duration();
   // Small segments avoid a full-circle arc special case at 25:00.
@@ -51,18 +53,18 @@ void paint() {
     int y = 233 + lroundf(sinf(angle) * 218);
     canvas.fillCircle(x, y, 4, i < fraction * 120 ? accent : 0x24282F);
   }
-  label("POMODORO", 63, 2, muted);
+  label(timer.running ? "POMODORO / RUNNING" : "POMODORO / STOPPED", 63, 2, accent);
   label(timer.phase == Pomodoro::Focus ? "FOCUS" :
         timer.phase == Pomodoro::ShortBreak ? "SHORT BREAK" : "LONG BREAK", 111, 3, accent);
   canvas.fillRoundRect(touchLeft, touchTop, touchWidth, touchHeight, 32,
-                       timer.phase == Pomodoro::Focus ? 0x301A17 : 0x112E26);
+                       timer.running ? accent : 0x1A2435);
   canvas.drawRoundRect(touchLeft, touchTop, touchWidth, touchHeight, 32, accent);
   char text[48];
   uint32_t seconds = (timer.remaining + 999) / 1000;
   snprintf(text, sizeof(text), "%02lu:%02lu", (unsigned long)(seconds / 60), (unsigned long)(seconds % 60));
-  label(text, 170, 8, TFT_WHITE);
-  label(timer.running ? "TAP TO PAUSE" : "TAP TO START", 254, 3, accent);
-  label("TOUCH ANYWHERE IN THIS BOX", 295, 2, muted);
+  label(text, 170, 8, ink);
+  label(timer.running ? "TAP TO PAUSE" : "TAP TO START", 254, 3, ink);
+  label("TOUCH ANYWHERE IN THIS BOX", 295, 2, timer.running ? ink : muted);
   for (int i = 0; i < 4; ++i) {
     int done = timer.completed % 4;
     if (timer.phase == Pomodoro::LongBreak) done = 4;
